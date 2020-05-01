@@ -14,8 +14,7 @@
 library("shiny")
 library("shinyBS")
 library("shinyjs")
-setwd("/Users/kennyxu1983hotmail.com/Dropbox/BibhasRajuMRT/Mobile Health Setting/R program/Shiny")
-source("/Users/kennyxu1983hotmail.com/Dropbox/BibhasRajuMRT/Mobile Health Setting/R program/Shiny/server.R")
+source("server.R")
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
