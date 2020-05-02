@@ -1,0 +1,104 @@
+<!--
+Copyright 2020 Xu J. and Yan X.
+This file is part of MLMRT-SS Calculator.
+MLMRT-SS Calculator is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+MLMRT-SS Calculator is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+You should have received a copy of the GNU Affero General Public License
+along with MLMRT-SS Calculator.  If not, see <http://www.gnu.org/licenses/>.
+Contact the author at kenny.xu@duke-nus.edu.sg
+-->
+
+<style>
+    ol {padding-left: 30px;}
+    ul {padding-left: 25px;}
+</style>
+
+<h3>Purpose</h3>
+<p>This applet provides a sample size calculator for multi-level micro-randomised trials
+  (MLMRTs).</p>
+
+<h3>Required Inputs</h3>
+<div>
+    <ol>
+    
+        <h4><li>Number of Decision Time Point</li></h4>
+        <ul>
+            <li>Number of days for the study period.</li>
+            <li>Number of decision time points per day.</li>
+        </ul>   
+        
+        <h4><li>Number of Intervention Message Level</li></h4>    
+        <ul>
+            <li>Number of intervention message levels addded at the first day of the study. <strong>Note:</strong>  the intervention levels do not include the control level.</li>        
+            <li>Number of intervention message levels addded at the halfway in days of the study period. <strong>Note:</strong>  this value is fixed at zero if adding message levels is not considered.</li>
+        </ul>    
+        
+        <h4><li>Randomisation Probability</li></h4>    
+        <ul>    
+            <li>Randomization probability for either intervention message level at each decision time point. For example, if this probability is 0.4, there are four interventon message levels added at the begining and no levels are added later, the randomisation probabilities of the control level and each of the intervention levels are 0.6 and 0.1 respectively at each decision time point over the study period. </li>
+        </ul>
+        
+        <h4><li>Expected Availability</li></h4>
+        <ul>
+            <li>The expected probability that a participant is available to receive intervention level at a decision time.</li>
+            <li>A pattern of expected availability, either constant or time-varying over the course of the study, i.e. quadratic or linear.</li>
+        </ul>
+        
+        <h4><li>Proximal Effect</li></h4>
+        <ul>
+            <li>A trend of proximal effect of an intervention level is time-varied over days. It can be either constant, linear, quadratic or linear then constant.</li>
+            <ul>
+                <li><strong>Note:</strong> 
+                The <em>proximal intervention effect</em> of each intervention level
+                at each decision time point is defined as the mean difference in the proximal outcome between the available participants assigned to that intervention level and the available participants assigned to the control level. The standardised proximal effect is the proximal effect divided by the average standard error throughout the study.</li>
+                <li>The mean of proximal intervention effect is an average over all decision time points over the study period.</li>
+            </ul>
+        </ul>
+        
+        <h4><li> Sample Size Calculation Method </li></h4>
+        <ul>
+            <li> Power. </li>
+            <li> Precision. </li>
+        </ul>
+        
+        <h4><li> Test Statistics Distribution Type </li></h4>
+        <ul>
+            <li> Chi-squared distribution </li>
+            <li> Hotelling's T-squared distribution with denominator degrees of freedom N</li>
+            <li> Hotelling's T-squared distribution with denominator degrees of freedom N-1 </li>
+            <li> Hotelling's T-squared distribution with denominator degrees of freedom N-1-q </li>
+        </ul>
+        
+        
+        
+    </ol>
+</div>
+
+<h3>Possible Output</h3>
+            <p> Sample Size </p>
+            <p> Power </p>
+            <p> Coverage Probability </p>
+
+<h3>Reference</h3>
+    <p> Xu, J., Yan, X., Figueroa, C., Williams, J.J. and Chakraborty, B. (2020). A Multi-Level Micro-Randomized Trial for Detecting the Proximal Effect of a Mobile Application Messages on Physical Activity in Diabetes and Depression. </p>
+
+<h3>Source Code</h3>
+    <p>Source code for this application is available on <a href="https://github.com/Kenny-Jing-Xu/MLMRT-SS">GitHub</a>.</p>
+
+<script>
+$(document).ready(function(){
+  $("#background").on("hide.bs.collapse", function(){
+    $("#backgroundtitle").html('<span class="glyphicon glyphicon-collapse-down" style="font-size: 80%;"></span> <span style="font-size: 20px;">Additional Background Information</span>');
+  });
+  $("#background").on("show.bs.collapse", function(){
+    $("#backgroundtitle").html('<span class="glyphicon glyphicon-collapse-up" style="font-size: 80%;"></span> <span style="font-size: 20px;">Additional Background Information</span>');
+  });
+});
+</script>
+
