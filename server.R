@@ -38,8 +38,8 @@ shinyServer(
   output$choice_power_warning <-renderText(
     {      
     validate(
-      need(input$sample_size_power > 0,"Error: Please specify Number of Participants greater than 0"), 
-      need(input$sample_size_power == round(input$sample_size_power),"Error: Please enter integer value for Number of Participants")
+      need(input$sample_size_power > 0,"Error: Please specify Number of Participants greater than 0")
+      #need(input$sample_size_power == round(input$sample_size_power),"Error: Please enter integer value for Number of Participants")
     )
   }
   )
@@ -198,8 +198,10 @@ shinyServer(
       }
       else if( result == "choice_power" )
       {
-        N <- input$sample_size_power
-        SS <- N
+        N <- round(input$sample_size_power)
+        if( N > 0 ){ SS <- N }
+        else{ stop( "Error: Please specify Number of Participants greater than 0" ) }
+        
         MRTN <- SampleSize_MLMRT( days=days, occ_per_day=occ_per_day, aa.day.aa = aa_day_aa, prob=prob, beta_shape=beta_shape, beta_mean=beta_mean, beta_initial=beta_initial, 
                                  beta_quadratic_max=beta_quadratic_max, tau_shape=tau_shape, tau_mean=tau_mean, tau_initial=tau_mean, tau_quadratic_max=beta_quadratic_max, 
                                  sigma=1, pow=0.8, sigLev=sigLev, method = method, test = test, result = result, SS =SS )  
