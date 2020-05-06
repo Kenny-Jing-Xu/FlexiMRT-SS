@@ -353,7 +353,9 @@ SampleSize_MLMRT=function(days, occ_per_day,
                           result, SS) 
 {
   if(pow < 0){stop("Error: Please specify the power greater than or equal to 0")}
-  if(pow > 1){stop("Error: Error: Please specify the power less than or equal to 1")}
+  if(pow > 1){stop("Error: Please specify the power less than or equal to 1")}
+  if(sigLev < 0){stop("Error: Please specify the significance greater than or equal to 0")}
+  if(sigLev > 1){stop("Error: Please specify the significance less than or equal to 1")}
   beta_shape <- tolower(beta_shape)
   tau_shape <- tolower(tau_shape)
   
@@ -361,6 +363,7 @@ SampleSize_MLMRT=function(days, occ_per_day,
   else if( beta_shape == "linear" ){ p_input = 2 }
   else if( beta_shape == "linear and constant" ){ p_input = 2 }
   else if( beta_shape == "quadratic" ){ p_input = 3 }
+  else{ stop( "Error: Please specify a trend for the proximal effect" ) }
   
   beta_input=matrix(0, days*occ_per_day, dim(prob)[2]-1)
   beta1=matrix(0, p_input, dim(prob)[2]-1)
