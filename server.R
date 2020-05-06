@@ -118,6 +118,27 @@ shinyServer(
     aa_freq = length( aa_day ) - 1;
     aa_day_aa = rep( ( aa_day )[ 1:aa_freq ], aa_each )
     
+    tau_shape = input$tau_shape
+    if( tau_shape == "quadratic"  )
+    {
+      tau_mean = input$tau_quadratic_mean
+      tau_initial = input$tau_quadratic_initial
+      tau_quadratic_max = input$tau_quadratic_max
+    }
+    else if( tau_shape == "linear"  )
+    {
+      tau_mean = input$tau_linear_mean
+      tau_initial = input$tau_linear_initial
+      tau_quadratic_max = days
+    }
+    else if( tau_shape == "constant"  )
+    {
+      tau_mean = input$tau_constant_mean
+      tau_initial = input$tau_constant_mean
+      tau_quadratic_max = 1
+    }
+    else{ stop( "Error: Please specify a pattern for the expected availability" ) }
+    
     beta_shape = input$beta_shape
     if( beta_shape == "linear and constant" ){
       beta_mean = rep( input$beta_linearconst_mean, sum( aa_each ) )
@@ -142,30 +163,13 @@ shinyServer(
       beta_initial = rep( input$beta_constant_mean, sum( aa_each ) )
       beta_quadratic_max = aa_day_aa - 1 + 1
     }
-    
-    tau_shape = input$tau_shape
-    if( tau_shape == "quadratic"  )
-    {
-      tau_mean = input$tau_quadratic_mean
-      tau_initial = input$tau_quadratic_initial
-      tau_quadratic_max = input$tau_quadratic_max
-    }
-    else if( tau_shape == "linear"  )
-    {
-      tau_mean = input$tau_linear_mean
-      tau_initial = input$tau_linear_initial
-      tau_quadratic_max = days
-    }
-    else if( tau_shape == "constant"  )
-    {
-      tau_mean = input$tau_constant_mean
-      tau_initial = input$tau_constant_mean
-      tau_quadratic_max = 1
-    }
+    else{ stop( "Error: Please specify a trend for the proximal effect" ) }
     
     method = input$method
     test = input$test
     sigLev = input$sigLev
+    if( sigLev >= 0 & sigLev <= 1 ){ sigLev = sigLev } 
+    else{stop("Please specify the level of significance between range 0 to 1 inclusive")}
     result = input$result_choices
     
     prob.arm = input$prob.arm
@@ -183,6 +187,9 @@ shinyServer(
       if( result == "choice_sample_size" )
       {
         pow = input$power
+        if( pow >= 0 & pow <= 1 ){ pow = pow } 
+        else{stop("Please specify the power between range 0 to 1 inclusive")}
+        
         MRTN <- SampleSize_MLMRT( days=days, occ_per_day=occ_per_day, aa.day.aa = aa_day_aa, prob=prob, beta_shape=beta_shape, beta_mean=beta_mean, beta_initial=beta_initial, 
                                   beta_quadratic_max=beta_quadratic_max, tau_shape=tau_shape, tau_mean=tau_mean, tau_initial=tau_mean, tau_quadratic_max=beta_quadratic_max, 
                                   sigma=1, pow=pow, sigLev=sigLev, method = method, test = test, result = result )
@@ -238,11 +245,11 @@ shinyServer(
       need(input$occ_per_day == round(input$occ_per_day),"Error: Please enter an integer for the number of occasions per day"),
       need(input$occ_per_day > 0 ,"Error: Please specify the number of occasions per day greater than 0"),
      
-      need(input$sigLev >= 0,"Error: Please specify the significance level greater than or equal to 0"),
-      need(input$sigLev <= 1,"Error: Please specify the significance Level less than or equal to 1"),
+      #need(input$sigLev >= 0,"Error: Please specify the significance level greater than or equal to 0"),
+      #need(input$sigLev <= 1,"Error: Please specify the significance Level less than or equal to 1"),
       
-      need(input$power >= 0 ,"Error: Please specify power greater than or equal to 0"),
-      need(input$power <= 1 ,"Error: Please specify the power less than or equal to 1"),
+      #need(input$power >= 0 ,"Error: Please specify power greater than or equal to 0"),
+      #need(input$power <= 1 ,"Error: Please specify the power less than or equal to 1"),
       
       need(input$beta_linearconst_mean > 0,"Error: Please specify an average standardized effect greater than 0"),
       need(input$beta_linearconst_mean <= 1,"Error: Please specify an average standardized effect less than or equal to 1"),
