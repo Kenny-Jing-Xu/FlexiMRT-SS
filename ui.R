@@ -11,6 +11,8 @@
 #install.packages("shinyBS")
 #install.packages("shinyjs")
 
+options(shiny.sanitize.errors = FALSE)
+
 library("shiny")
 library("shinyBS")
 library("shinyjs")
