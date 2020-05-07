@@ -117,8 +117,8 @@ shinyServer(
     if( occ_per_day > 0 ){ occ_per_day <- round(occ_per_day) }
     else{ stop( "Error: Please specify the number of occasions per day greater than 0" ) }
     
-    if( input$messages_start >= 0 ){ messages_start <- round(input$messages_start) }
-    else{ stop( "Error: Please specify the number of intervention message levels added at day 1 greater than or equal to 0" ) }
+    if( input$messages_start > 0 ){ messages_start <- round(input$messages_start) }
+    else{ stop( "Error: Please specify the number of intervention message levels added at day 1 greater than 0" ) }
     
     if( input$messages_mid >= 0 ){ messages_mid <- round(input$messages_mid) }
     else{ stop( "Error: Please specify the number of intervention message levels added halfway through the study greater than or equal to 0" ) }
