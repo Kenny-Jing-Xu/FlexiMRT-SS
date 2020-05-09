@@ -131,25 +131,35 @@ shinyServer(
     tau_shape = input$tau_shape
     if( tau_shape == "quadratic"  )
     {
-      tau_mean = input$tau_quadratic_mean
+      tau_mean <- input$tau_quadratic_mean
+      if( tau_mean > 0 & tau_mean <= 1 ){ tau_mean <- tau_mean }
+      else{ stop( "Error: Please specify the mean of availability greater than 0, but less than or equal to 1" ) }
       
-      tau_initial = input$tau_quadratic_initial
+      tau_initial <- input$tau_quadratic_initial
+      if( tau_initial > 0 & tau_initial >= tau_mean ){ tau_initial <- tau_initial }
+      else{ stop( "Error: Please specify the initial availability greater than 0, and greater than or equal to the average availability" ) }
       
       tau_quadratic_max = input$tau_quadratic_max
-      
+      if( tau_quadratic_max >=1 | tau_quadratic_max <= days ){ tau_quadratic_max <- round(tau_quadratic_max) }
+      else{ stop( "Error: Please specify the maximum availability day within study the duration" ) }
     }
     else if( tau_shape == "linear"  )
     {
       tau_mean = input$tau_linear_mean
+      if( tau_mean > 0 & tau_mean <= 1 ){ tau_mean <- tau_mean }
+      else{ stop( "Error: Please specify the mean of availability greater than 0, but less than or equal to 1" ) }
       
       tau_initial = input$tau_linear_initial
+      if( tau_initial > 0 & tau_initial >= tau_mean ){ tau_initial <- tau_initial }
+      else{ stop( "Error: Please specify the initial availability greater than 0, and greater than or equal to the average availability" ) }
       
       tau_quadratic_max = days
-      
     }
     else if( tau_shape == "constant"  )
     {
       tau_mean = input$tau_constant_mean
+      if( tau_mean > 0 & tau_mean <= 1 ){ tau_mean <- tau_mean }
+      else{ stop( "Error: Please specify the mean of availability greater than 0, but less than or equal to 1" ) }
       
       tau_initial = input$tau_constant_mean
       
@@ -161,26 +171,40 @@ shinyServer(
     beta_shape = input$beta_shape
     if( beta_shape == "linear and constant" ){
       beta_mean = rep( input$beta_linearconst_mean, sum( aa_each ) )
+      if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
+      else{ stop("Error: Please specify the average standardised effect size greater than 0, but less or equal to 1") }
       
       beta_initial = rep( input$beta_linearconst_initial, sum( aa_each ) )
+      if( min(beta_initial) >=0 & max(beta_initial) <= beta_mean ){ beta_initial <- beta_initial }
+      else{ stop("Error: Please specify the standardised initial effect size greater than or equal to 0, and less than or equal to average standardised effect size") }
       
       beta_quadratic_max = aa_day_aa - 1 + input$beta_linearconst_max
-      
+      if( min(beta_quadratic_max) >= 1 & max(beta_quadratic_max) <= days ){ beta_quadratic_max <- round(beta_quadratic_max) }
+      else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
     }
     else if( beta_shape == "quadratic"  )
     {
       beta_mean = rep( input$beta_quadratic_mean, sum( aa_each ) )
+      if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
+      else{ stop("Error: Please specify the average standardised effect size greater than 0, but less or equal to 1") }
       
       beta_initial = rep( input$beta_quadratic_initial, sum( aa_each ) )
+      if( min(beta_initial) >=0 & max(beta_initial) <= beta_mean ){ beta_initial <- beta_initial }
+      else{ stop("Error: Please specify the standardised initial effect size greater than or equal to 0, and less than or equal to average standardised effect size") }
       
       beta_quadratic_max = aa_day_aa - 1 + input$beta_quadratic_max
-      
+      if( min(beta_quadratic_max) >= 1 & max(beta_quadratic_max) <= days ){ beta_quadratic_max <- round(beta_quadratic_max) }
+      else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
     }
     else if( beta_shape == "linear"  )
     {
       beta_mean = rep( input$beta_linear_mean, sum( aa_each ) )
+      if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
+      else{ stop("Error: Please specify the average standardised effect size greater than 0, but less or equal to 1") }
       
       beta_initial = rep( input$beta_linear_initial, sum( aa_each ) )
+      if( min(beta_initial) >=0 & max(beta_initial) <= beta_mean ){ beta_initial <- beta_initial }
+      else{ stop("Error: Please specify the standardised initial effect size greater than or equal to 0, and less than or equal to average standardised effect size") }
       
       beta_quadratic_max = aa_day_aa - 1 + days
       
@@ -188,6 +212,8 @@ shinyServer(
     else if( beta_shape == "constant"  )
     {
       beta_mean = rep( input$beta_constant_mean, sum( aa_each ) )
+      if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
+      else{ stop("Error: Please specify the average standardised effect size greater than 0, but less or equal to 1") }
       
       beta_initial = rep( input$beta_constant_mean, sum( aa_each ) )
       
@@ -236,7 +262,7 @@ shinyServer(
       {
         N <- round(input$sample_size_power)
         if( N > 0 ){ SS <- N }
-        else{ stop( "Error: Please specify Number of Participants greater than 0" ) }
+        else{ stop( "Error: Please specify the number of participants greater than 0" ) }
         
         MRTN <- SampleSize_MLMRT( days=days, occ_per_day=occ_per_day, aa.day.aa = aa_day_aa, prob=prob, beta_shape=beta_shape, beta_mean=beta_mean, beta_initial=beta_initial, 
                                  beta_quadratic_max=beta_quadratic_max, tau_shape=tau_shape, tau_mean=tau_mean, tau_initial=tau_mean, tau_quadratic_max=beta_quadratic_max, 
@@ -262,7 +288,7 @@ shinyServer(
       {
         N <- round(input$sample_size_precision)
         if( N > 0 ){ SS <- N }
-        else{ stop( "Error: Please specify Number of Participants greater than 0" ) }
+        else{ stop( "Error: Please specify the number of participants greater than 0" ) }
         
         MRTN <- SampleSize_MLMRT( days=days, occ_per_day=occ_per_day, aa.day.aa = aa_day_aa, prob=prob, beta_shape=beta_shape, beta_mean=beta_mean, beta_initial=beta_initial, 
                                   beta_quadratic_max=beta_quadratic_max, tau_shape=tau_shape, tau_mean=tau_mean, tau_initial=tau_mean, tau_quadratic_max=beta_quadratic_max, 
