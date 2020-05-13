@@ -138,10 +138,10 @@ shinyUI(fluidPage(
             conditionalPanel(condition="input.beta_shape == 'linear' ",
                              sliderInput("beta_linear_mean",label="The standardised effect size or margin of error of average proximal effect",min = 0, max = 1,value = 0.2),
                              numericInput("beta_linear_initial", label = "The standardised effect size or margin of error of initial proximal effect",value = 0.02),
-                             p(em("Notes"),": The linearly increasing form of a proximal effect might be used if participants
+                             p(em("Notes"),": The linearly increasing form of a proximal effect may be used if participants
                                                          will get more enthusiastically engage in the apps and thus the proximal effect will increase as the 
                                                          study goes."),
-                             p("The linearly decreasing form of a proximal effect might be used if participants
+                             p("The linearly decreasing form of a proximal effect may be used if participants
                                                         are likely to disengage the activity suggestionss and thus the proximal effect will decrease as the 
                                                          study goes.")
             ),
@@ -152,7 +152,7 @@ shinyUI(fluidPage(
                              numericInput("beta_linearconst_initial", label = "The standardised effect size or margin of error of initial proximal effect",value = 0.02),
                              p(em("Notes"),": The linear then constant form of a proximal effect might be used if you expect that 
                                                          participants will be benefit from the messages delivered by the app through reinforcement learning algorithm 
-                                                         and thus the proximal effect will get higher until reach maximum value then maitain it for the rest of the
+                                                         and thus the proximal effect will get higher until reach maximum value then maintain it for the rest of the
                                                          study period.")
             )
             
