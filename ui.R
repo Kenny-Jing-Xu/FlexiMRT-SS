@@ -18,7 +18,7 @@ library("shinyBS")
 library("shinyjs")
 source("server.R")
 
-# Define UI for application that draws a histogram
+# Define UI for application that calculate sample size for MLMRT
 shinyUI(fluidPage(
     # Application title
     titlePanel(HTML("<strong>MLMRT-SS Calculator</strong>: A Sample Size Calculator for the Multi-Level Micro-Randomised Trials"), 
