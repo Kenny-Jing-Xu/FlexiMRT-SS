@@ -10,7 +10,7 @@
 library(shiny)
 source("SampleSizeMLMRT.R")
 
-# Define server logic required to draw a histogram
+# Define server logic required to calculate sample size for MLMRT
 shinyServer(
   function(input, output) {
     
