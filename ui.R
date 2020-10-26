@@ -51,9 +51,20 @@ shinyUI(fluidPage(
         tags$hr(),
         
         #### time-varying randomization probability ####
-        h3("Randomisation Probability"), 
+        h3("Randomization Probability"), 
         verticalLayout(
-            sliderInput("prob.arm",label="Randomisation probability for either intervention message level at each decision time point ",min = 0, max = 1,value = 0.4)
+            
+            radioButtons(inputId="randomization_probability_choices", label = "Which of the randomization probability strategies would you like to use?", 
+                         choices=list("Constant Control Probability"="choice_constant_probability_control", "Uniform Random Probability"="choice_uniform_random"),
+                         selected = "choice_constant_probability_control"),
+            
+            ### type in the desired power if you want to calculate the sample size ###
+            conditionalPanel(condition="input.randomization_probability_choices=='choice_constant_probability_control'
+                             ",
+                             sliderInput("prob.arm",label="Randomisation probability for either intervention message level at each decision time point ",min = 0, max = 1,value = 0.4)
+                             
+            )
+            
         ),
         tags$hr(),
         
