@@ -233,16 +233,31 @@ shinyServer(
     if( sigLev >= 0 & sigLev <= 1 ){ sigLev = sigLev } 
     else{stop("Please specify the level of significance between range 0 to 1 inclusive")}
     result = input$result_choices
+    randomization <- input$randomization_probability_choices
     
-    prob.arm = input$prob.arm
-    prob.con = 1 - prob.arm
-    prob = matrix( 0, days, ( 1 + sum(aa_each) ) )
-    prob[ , 1 ] = rep( prob.con, days )
-    for( l in 1:( length( aa_day ) - 1 ) )
+    if( randomization == "choice_constant_probability_control" )
     {
-      prob[ ( aa_day[ l + 0 ] + 0 ):( aa_day[ l + 1 ] - 1 ), 2:( 1 + cumsum( aa_each )[ l ] ) ] = prob.arm/( cumsum( aa_each )[ l ] )
+      
+      prob.arm = input$prob.arm
+      prob.con = 1 - prob.arm
+      prob = matrix( 0, days, ( 1 + sum(aa_each) ) )
+      prob[ , 1 ] = rep( prob.con, days )
+      for( l in 1:( length( aa_day ) - 1 ) )
+      {
+        prob[ ( aa_day[ l + 0 ] + 0 ):( aa_day[ l + 1 ] - 1 ), 2:( 1 + cumsum( aa_each )[ l ] ) ] = prob.arm/( cumsum( aa_each )[ l ] )
+      }
+      prob[ ( aa_day[ length( aa_day ) ] ), 2:( 1 + sum( aa_each ) ) ] = prob.arm/( sum( aa_each ) )
+      
     }
-    prob[ ( aa_day[ length( aa_day ) ] ), 2:( 1 + sum( aa_each ) ) ] = prob.arm/( sum( aa_each ) )
+    else if( randomization == "choice_uniform_random" )
+    {
+      prob = matrix( 0, days, ( 1 + sum(aa_each) ) )
+      for( l in 1:( length( aa_day ) - 1 ) )
+      {
+        prob[ ( aa_day[ l + 0 ] + 0 ):( aa_day[ l + 1 ] - 1 ), 1:( 1 + cumsum( aa_each )[ l ] ) ] = 1/( cumsum( aa_each )[ l ] + 1 )
+      }
+      prob[ ( aa_day[ length( aa_day ) ] ), 1:( 1 + sum( aa_each ) ) ] = 1/( 1 + sum( aa_each ) )
+    }
     
     if( method == "power" )
     {
