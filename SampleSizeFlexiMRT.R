@@ -342,7 +342,7 @@ SampleSizeAA=function(days, occ_per_day,
     )
 }
 
-SampleSize_MLMRT=function(days, occ_per_day, 
+SampleSize_FlexiMRT=function(days, occ_per_day, 
                           aa.day.aa, 
                           prob, 
                           beta_shape, beta_mean, beta_initial, beta_quadratic_max, 
