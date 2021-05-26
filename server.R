@@ -8,7 +8,7 @@
 #
 
 library(shiny)
-source("SampleSizeMLMRT.R")
+source("SampleSizeFlexiMRT.R")
 
 # Define server logic required to calculate sample size for MLMRT
 shinyServer(
@@ -98,6 +98,53 @@ shinyServer(
   #    )
   #  }
   #)
+    
+    ### Input of time-varying randomization probability ##
+    output$timevar_prob_text <-
+      renderText({paste("Upload a .csv file containing columns of probability for each of categories include both control and intervention to specify time-varying randomization probabilities on each day."
+        #Depending on how frequently you want to vary the randomization probability, you should provide either",
+         #               input$days,
+          #              "(one per day)
+        #or",
+         #               input$days * input$occ_per_day,
+          #              "(one per decision time) pairs. "
+      )
+      })
+    
+    ### Download handlers for reactively-created randomization probability templates ###
+    output$timevar_prob_template <- downloadHandler(
+      filename = function() {paste0("FlexiMRT-SS-Randomization-Probability-Day.csv")},
+      content = function(file) {
+        write.csv(
+          as.data.frame(
+            matrix(
+              NA,
+              nrow = input$days,
+              ncol = 4,
+              dimnames = list(NULL, c(
+                "randomization.probability.control",
+                "randomization.probability.intervention1",
+                "randomization.probability.intervention2",
+                "randomization.probability.intervention3"
+                )
+                )
+              )
+            ),
+          file = file, na = "", row.names = F
+        )
+      },
+      contentType = "text/csv"
+    )
+    
+    output$download_template_caption <- renderText({
+      paste("The template will contain one row per day.", 
+            "Just fill in your desired randomization probabilities for the control and intervention categories, and upload the file.")
+    })
+    
+    #### File Upload reset button
+    observeEvent( input$file.resetbutton, 
+                 { reset( paste0( "file1" ) ) }
+    )
   
   ### Generate the current result of sample size 
   ### Constant trend of expected availability
@@ -105,6 +152,7 @@ shinyServer(
   ### Power method
   ### Hotelling t-square type of distribution for the test statistics with 
   ### denominator degree of freedom N 
+    
   Result_size_power_cp <- eventReactive(input$size_power_cp, 
                                {  ### Generate this current result of sample size if the corresponding 
                                   ### action button is pressed
@@ -172,11 +220,11 @@ shinyServer(
     if( beta_shape == "linear and constant" ){
       beta_mean = rep( input$beta_linearconst_mean, sum( aa_each ) )
       if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
-      else{ stop("Error: Please specify the average standardised effect size greater than 0, but less or equal to 1") }
+      else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
       
       beta_initial = rep( input$beta_linearconst_initial, sum( aa_each ) )
       if( min(beta_initial) >=0 & max(beta_initial) <= beta_mean ){ beta_initial <- beta_initial }
-      else{ stop("Error: Please specify the standardised initial effect size greater than or equal to 0, and less than or equal to average standardised effect size") }
+      else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
       
       beta_quadratic_max = aa_day_aa - 1 + input$beta_linearconst_max
       if( min(beta_quadratic_max) >= 1 & max(beta_quadratic_max) <= days ){ beta_quadratic_max <- round(beta_quadratic_max) }
@@ -186,11 +234,11 @@ shinyServer(
     {
       beta_mean = rep( input$beta_quadratic_mean, sum( aa_each ) )
       if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
-      else{ stop("Error: Please specify the average standardised effect size greater than 0, but less or equal to 1") }
+      else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
       
       beta_initial = rep( input$beta_quadratic_initial, sum( aa_each ) )
       if( min(beta_initial) >=0 & max(beta_initial) <= beta_mean ){ beta_initial <- beta_initial }
-      else{ stop("Error: Please specify the standardised initial effect size greater than or equal to 0, and less than or equal to average standardised effect size") }
+      else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
       
       beta_quadratic_max = aa_day_aa - 1 + input$beta_quadratic_max
       if( min(beta_quadratic_max) >= 1 & max(beta_quadratic_max) <= days ){ beta_quadratic_max <- round(beta_quadratic_max) }
@@ -200,11 +248,11 @@ shinyServer(
     {
       beta_mean = rep( input$beta_linear_mean, sum( aa_each ) )
       if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
-      else{ stop("Error: Please specify the average standardised effect size greater than 0, but less or equal to 1") }
+      else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
       
       beta_initial = rep( input$beta_linear_initial, sum( aa_each ) )
       if( min(beta_initial) >=0 & max(beta_initial) <= beta_mean ){ beta_initial <- beta_initial }
-      else{ stop("Error: Please specify the standardised initial effect size greater than or equal to 0, and less than or equal to average standardised effect size") }
+      else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
       
       beta_quadratic_max = aa_day_aa - 1 + days
       
@@ -213,7 +261,7 @@ shinyServer(
     {
       beta_mean = rep( input$beta_constant_mean, sum( aa_each ) )
       if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
-      else{ stop("Error: Please specify the average standardised effect size greater than 0, but less or equal to 1") }
+      else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
       
       beta_initial = rep( input$beta_constant_mean, sum( aa_each ) )
       
@@ -233,31 +281,41 @@ shinyServer(
     if( sigLev >= 0 & sigLev <= 1 ){ sigLev = sigLev } 
     else{stop("Please specify the level of significance between range 0 to 1 inclusive")}
     result = input$result_choices
-    randomization <- input$randomization_probability_choices
     
-    if( randomization == "choice_constant_probability_control" )
-    {
-      
-      prob.arm = input$prob.arm
-      prob.con = 1 - prob.arm
-      prob = matrix( 0, days, ( 1 + sum(aa_each) ) )
-      prob[ , 1 ] = rep( prob.con, days )
-      for( l in 1:( length( aa_day ) - 1 ) )
+    if( input$ranPro == "Constant" ){
+      ### If the randomization probability is constant ###
+      randomization <- input$randomization_probability_choices
+      if( randomization == "choice_constant_probability_control" )
       {
-        prob[ ( aa_day[ l + 0 ] + 0 ):( aa_day[ l + 1 ] - 1 ), 2:( 1 + cumsum( aa_each )[ l ] ) ] = prob.arm/( cumsum( aa_each )[ l ] )
+        
+        prob.arm = input$prob.arm
+        prob.con = 1 - prob.arm
+        prob = matrix( 0, days, ( 1 + sum(aa_each) ) )
+        prob[ , 1 ] = rep( prob.con, days )
+        for( l in 1:( length( aa_day ) - 1 ) )
+        {
+          prob[ ( aa_day[ l + 0 ] + 0 ):( aa_day[ l + 1 ] - 1 ), 2:( 1 + cumsum( aa_each )[ l ] ) ] = prob.arm/( cumsum( aa_each )[ l ] )
+        }
+        prob[ ( aa_day[ length( aa_day ) ] ), 2:( 1 + sum( aa_each ) ) ] = prob.arm/( sum( aa_each ) )
+        
       }
-      prob[ ( aa_day[ length( aa_day ) ] ), 2:( 1 + sum( aa_each ) ) ] = prob.arm/( sum( aa_each ) )
+      else if( randomization == "choice_uniform_random" )
+      {
+        prob = matrix( 0, days, ( 1 + sum(aa_each) ) )
+        for( l in 1:( length( aa_day ) - 1 ) )
+        {
+          prob[ ( aa_day[ l + 0 ] + 0 ):( aa_day[ l + 1 ] - 1 ), 1:( 1 + cumsum( aa_each )[ l ] ) ] = 1/( cumsum( aa_each )[ l ] + 1 )
+        }
+        prob[ ( aa_day[ length( aa_day ) ] ), 1:( 1 + sum( aa_each ) ) ] = 1/( 1 + sum( aa_each ) )
+      }
       
     }
-    else if( randomization == "choice_uniform_random" )
-    {
-      prob = matrix( 0, days, ( 1 + sum(aa_each) ) )
-      for( l in 1:( length( aa_day ) - 1 ) )
-      {
-        prob[ ( aa_day[ l + 0 ] + 0 ):( aa_day[ l + 1 ] - 1 ), 1:( 1 + cumsum( aa_each )[ l ] ) ] = 1/( cumsum( aa_each )[ l ] + 1 )
-      }
-      prob[ ( aa_day[ length( aa_day ) ] ), 1:( 1 + sum( aa_each ) ) ] = 1/( 1 + sum( aa_each ) )
+    else if( input$ranPro == "Time-varying" ){
+      ### If the randomization probability is time-varying ###
+      inFile <- input$file1
+      prob <- read.csv(inFile$datapath, header = TRUE)
     }
+    
     
     if( method == "power" )
     {
@@ -267,7 +325,7 @@ shinyServer(
         if( pow >= 0 & pow <= 1 ){ pow = pow } 
         else{stop("Please specify the power between range 0 to 1 inclusive")}
         
-        MRTN <- SampleSize_MLMRT( days=days, occ_per_day=occ_per_day, aa.day.aa = aa_day_aa, prob=prob, beta_shape=beta_shape, beta_mean=beta_mean, beta_initial=beta_initial, 
+        MRTN <- SampleSize_FlexiMRT( days=days, occ_per_day=occ_per_day, aa.day.aa = aa_day_aa, prob=prob, beta_shape=beta_shape, beta_mean=beta_mean, beta_initial=beta_initial, 
                                   beta_quadratic_max=beta_quadratic_max, tau_shape=tau_shape, tau_mean=tau_mean, tau_initial=tau_mean, tau_quadratic_max=beta_quadratic_max, 
                                   sigma=1, pow=pow, sigLev=sigLev, method = method, test = test, result = result )
         N <- MRTN$N
@@ -279,7 +337,7 @@ shinyServer(
         if( N > 0 ){ SS <- N }
         else{ stop( "Error: Please specify the number of participants greater than 0" ) }
         
-        MRTN <- SampleSize_MLMRT( days=days, occ_per_day=occ_per_day, aa.day.aa = aa_day_aa, prob=prob, beta_shape=beta_shape, beta_mean=beta_mean, beta_initial=beta_initial, 
+        MRTN <- SampleSize_FlexiMRT( days=days, occ_per_day=occ_per_day, aa.day.aa = aa_day_aa, prob=prob, beta_shape=beta_shape, beta_mean=beta_mean, beta_initial=beta_initial, 
                                  beta_quadratic_max=beta_quadratic_max, tau_shape=tau_shape, tau_mean=tau_mean, tau_initial=tau_mean, tau_quadratic_max=beta_quadratic_max, 
                                  sigma=1, pow=0.8, sigLev=sigLev, method = method, test = test, result = result, SS =SS )  
         pow <- round( MRTN$P, digits = 2 )
@@ -292,7 +350,7 @@ shinyServer(
       if( result == "choice_sample_size" )
       {
         pow=0.8
-        MRTN <- SampleSize_MLMRT( days=days, occ_per_day=occ_per_day, aa.day.aa = aa_day_aa, prob=prob, beta_shape=beta_shape, beta_mean=beta_mean, beta_initial=beta_initial, 
+        MRTN <- SampleSize_FlexiMRT( days=days, occ_per_day=occ_per_day, aa.day.aa = aa_day_aa, prob=prob, beta_shape=beta_shape, beta_mean=beta_mean, beta_initial=beta_initial, 
                                   beta_quadratic_max=beta_quadratic_max, tau_shape=tau_shape, tau_mean=tau_mean, tau_initial=tau_mean, tau_quadratic_max=beta_quadratic_max, 
                                   sigma=1, pow=pow, sigLev=sigLev, method = method, test = test, result = result)
         N <- MRTN$N
@@ -305,7 +363,7 @@ shinyServer(
         if( N > 0 ){ SS <- N }
         else{ stop( "Error: Please specify the number of participants greater than 0" ) }
         
-        MRTN <- SampleSize_MLMRT( days=days, occ_per_day=occ_per_day, aa.day.aa = aa_day_aa, prob=prob, beta_shape=beta_shape, beta_mean=beta_mean, beta_initial=beta_initial, 
+        MRTN <- SampleSize_FlexiMRT( days=days, occ_per_day=occ_per_day, aa.day.aa = aa_day_aa, prob=prob, beta_shape=beta_shape, beta_mean=beta_mean, beta_initial=beta_initial, 
                                   beta_quadratic_max=beta_quadratic_max, tau_shape=tau_shape, tau_mean=tau_mean, tau_initial=tau_mean, tau_quadratic_max=beta_quadratic_max, 
                                   sigma=1, pow=0.8, sigLev=sigLev, method = method, test = test, result = result, SS = SS )
         CP <- round(MRTN$CP, digits = 2)  
