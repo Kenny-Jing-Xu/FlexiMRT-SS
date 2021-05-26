@@ -18,14 +18,14 @@ library("shinyBS")
 library("shinyjs")
 source("server.R")
 
-# Define UI for application that calculate sample size for MLMRT
+# Define UI for application that calculate sample size for MRT with Flexible Designs
 shinyUI(fluidPage(
     # Application title
-    titlePanel(HTML("<strong>MLMRT-SS Calculator</strong>: A Sample Size Calculator for the Multi-Level Micro-Randomised Trials"), 
-               windowTitle = "MLMRT-SS Calculator"),    
+    titlePanel(HTML("<strong>FlexiMRT-SS Calculator</strong>: A Sample Size Calculator for the Micro-Randomised Trials with Flexible Designs"), 
+               windowTitle = "FlexiMRT-SS Calculator"),    
     useShinyjs(),
     
-    ### Introduction of MLMRT-SS Calculator on left-hand side panel ###
+    ### Introduction of FlexiMRT-SS Calculator on left-hand side panel ###
     sidebarPanel(
         includeHTML("www/sidebar.Rhtml")
     ),
@@ -43,20 +43,25 @@ shinyUI(fluidPage(
         ),                                  
         tags$hr(),
         
-        h3("Number of Intervention Message Level"),
+        h3("Number of Intervention Message Category"),
         verticalLayout(
-            numericInput("messages_start",label = "Added at the first day of the study", value = 4 ),
-            numericInput("messages_mid",label = "Added at the halfway in days of the study period", value = 0 )
+            numericInput("messages_start",label = "Added at the first day of the study", value = 3 ),
+            numericInput("messages_mid",label = "Added at the halfway in days of the study period", value = 1 )
         ),                                  
         tags$hr(),
         
         #### time-varying randomization probability ####
         h3("Randomization Probability"), 
+        tabsetPanel(id = "ranPro",
+                    
+         tabPanel("Constant",
+         br(),
+                    
         verticalLayout(
             
             radioButtons(inputId="randomization_probability_choices", label = "Which of the randomization probability strategies would you like to use?", 
                          choices=list("Constant Control Probability"="choice_constant_probability_control", "Uniform Random Probability"="choice_uniform_random"),
-                         selected = "choice_constant_probability_control"),
+                         selected = "choice_uniform_random"),
             
             ### type in the desired power if you want to calculate the sample size ###
             conditionalPanel(condition="input.randomization_probability_choices=='choice_constant_probability_control'
@@ -65,6 +70,35 @@ shinyUI(fluidPage(
                              
             )
             
+        )#,
+        
+         ),
+        
+        tabPanel("Time-varying",
+                 br(),
+                 
+                 fluidRow(helpText(textOutput("timevar_prob_text"))),
+                 
+                 fluidRow(
+                     column(4,
+                            
+                            #conditionalPanel(condition="input.numbers =='re_dec'",
+                                             fileInput('file1', 'Choose a .csv file containing time-varying randomization probabilities to upload',
+                                                       accept = c('.csv')
+                                             ),
+                            bsButton("file.resetbutton", "Reset file upload", style = "link")
+                            ),
+                     
+                     column(4,
+                            ### downloading the sample file 
+                            p("If you would like to use a template, you can download one here:"),
+                            downloadButton("timevar_prob_template", "Download Template"),
+                            br(),
+                            textOutput("download_template_caption")
+                     )
+                 
+        )
+        )
         ),
         tags$hr(),
         
@@ -132,9 +166,9 @@ shinyUI(fluidPage(
             ),
             ### Inputs for quadratic trend of proximal effect ###
             conditionalPanel(condition="input.beta_shape =='quadratic'",
-                             sliderInput("beta_quadratic_mean",label="The standardised effect size or margin of error of average proximal effect",min = 0, max = 1,value = 0.2),
+                             sliderInput("beta_quadratic_mean",label="The standardised effect size or margin of error of average proximal effect",min = 0, max = 1,value = 0.1),
                              numericInput("beta_quadratic_max", label = "Day of maximal proximal effect", value = 28),
-                             numericInput("beta_quadratic_initial", label = "The standardised effect size or margin of error of initial proximal effect",value = 0.02),
+                             numericInput("beta_quadratic_initial", label = "The standardised effect size or margin of error of initial proximal effect",value = 0.01),
                              p(em("Notes"),": The quadratic form of a proximal effect might be used if you expect that 
                                                         initially participants will enthusiastically engage in the apps and thus the 
                                                          proximal effect will get higher. Then, as the study goes on, some participants are 
@@ -142,13 +176,13 @@ shinyUI(fluidPage(
             ),
             ### Inputs for constant trend of proximal effect ###
             conditionalPanel(condition="input.beta_shape =='constant'",
-                             numericInput("beta_constant_mean", label = "The standardised effect size or margin of error of average proximal effect",min = 0, max = 1, value = 0.2),
+                             numericInput("beta_constant_mean", label = "The standardised effect size or margin of error of average proximal effect",min = 0, max = 1, value = 0.1),
                              p(em("Notes"),": The proximal effect stays constant over the study.")
             ),
             ### Inputs for linear trend of proximal effect ###
             conditionalPanel(condition="input.beta_shape == 'linear' ",
-                             sliderInput("beta_linear_mean",label="The standardised effect size or margin of error of average proximal effect",min = 0, max = 1,value = 0.2),
-                             numericInput("beta_linear_initial", label = "The standardised effect size or margin of error of initial proximal effect",value = 0.02),
+                             sliderInput("beta_linear_mean",label="The standardised effect size or margin of error of average proximal effect",min = 0, max = 1,value = 0.1),
+                             numericInput("beta_linear_initial", label = "The standardised effect size or margin of error of initial proximal effect",value = 0.01),
                              p(em("Notes"),": The linearly increasing form of a proximal effect may be used if participants
                                                          will get more enthusiastically engage in the apps and thus the proximal effect will increase as the 
                                                          study goes."),
@@ -158,9 +192,9 @@ shinyUI(fluidPage(
             ),
             ### Inputs for linear then constant trend of proximal effect ###
             conditionalPanel(condition="input.beta_shape =='linear and constant'",
-                             sliderInput("beta_linearconst_mean",label="The standardised effect size or margin of error of average proximal effect",min = 0, max = 1,value = 0.2),
+                             sliderInput("beta_linearconst_mean",label="The standardized effect size or margin of error of average proximal effect",min = 0, max = 1,value = 0.1),
                              numericInput("beta_linearconst_max", label = "Day of maximal proximal effect", value = 28),
-                             numericInput("beta_linearconst_initial", label = "The standardised effect size or margin of error of initial proximal effect",value = 0.02),
+                             numericInput("beta_linearconst_initial", label = "The standardised effect size or margin of error of initial proximal effect",value = 0.01),
                              p(em("Notes"),": The linear then constant form of a proximal effect might be used if you expect that 
                                                          participants will be benefit from the messages delivered by the app through reinforcement learning algorithm 
                                                          and thus the proximal effect will get higher until reach maximum value then maintain it for the rest of the
@@ -184,9 +218,9 @@ shinyUI(fluidPage(
         verticalLayout(
             selectizeInput(inputId="test", label="Distribution Type", 
                            choices=list(
+                               "Hotelling T2 N-q-1"="hotelling N-q-1",
                                         "Hotelling T2 N"="hotelling N", 
                                         "Hotelling T2 N-1"="hotelling N-1", 
-                                        "Hotelling T2 N-q-1"="hotelling N-q-1",
                                         "Chi-square"="chi"
                                         ) 
             )
