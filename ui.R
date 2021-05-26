@@ -195,8 +195,8 @@ shinyUI(fluidPage(
                              sliderInput("beta_linearconst_mean",label="The standardized effect size or margin of error of average proximal effect",min = 0, max = 1,value = 0.1),
                              numericInput("beta_linearconst_max", label = "Day of maximal proximal effect", value = 28),
                              numericInput("beta_linearconst_initial", label = "The standardised effect size or margin of error of initial proximal effect",value = 0.01),
-                             p(em("Notes"),": The linear then constant form of a proximal effect might be used if you expect that 
-                                                         participants will be benefit from the messages delivered by the app through reinforcement learning algorithm 
+                             p(em("Notes"),": The linear then constant form of a proximal effect might be used, e.g., if you expect that 
+                                                         participants will be benefit from the messages
                                                          and thus the proximal effect will get higher until reach maximum value then maintain it for the rest of the
                                                          study period.")
             )
