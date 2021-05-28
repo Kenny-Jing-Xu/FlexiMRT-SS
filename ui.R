@@ -153,6 +153,10 @@ shinyUI(fluidPage(
         
         #### Specifying trend for Proximal Effect ####
         h3("Proximal Effect"),
+        tabsetPanel(id = "proEff",
+                    
+        tabPanel("Category-same",
+        br(),
         verticalLayout(
             ### Four trends of proximal effect to choose from
             ### quadratic, constant, linear, linear then constant
@@ -168,7 +172,7 @@ shinyUI(fluidPage(
             conditionalPanel(condition="input.beta_shape =='quadratic'",
                              sliderInput("beta_quadratic_mean",label="The standardised effect size or margin of error of average proximal effect",min = 0, max = 1,value = 0.1),
                              numericInput("beta_quadratic_max", label = "Day of maximal proximal effect", value = 28),
-                             numericInput("beta_quadratic_initial", label = "The standardised effect size or margin of error of initial proximal effect",value = 0.01),
+                             numericInput("beta_quadratic_initial", label = "The standardized effect size or margin of error of initial proximal effect",value = 0.01),
                              p(em("Notes"),": The quadratic form of a proximal effect might be used if you expect that 
                                                         initially participants will enthusiastically engage in the apps and thus the 
                                                          proximal effect will get higher. Then, as the study goes on, some participants are 
@@ -176,13 +180,13 @@ shinyUI(fluidPage(
             ),
             ### Inputs for constant trend of proximal effect ###
             conditionalPanel(condition="input.beta_shape =='constant'",
-                             numericInput("beta_constant_mean", label = "The standardised effect size or margin of error of average proximal effect",min = 0, max = 1, value = 0.1),
+                             numericInput("beta_constant_mean", label = "The standardized effect size or margin of error of average proximal effect",min = 0, max = 1, value = 0.1),
                              p(em("Notes"),": The proximal effect stays constant over the study.")
             ),
             ### Inputs for linear trend of proximal effect ###
             conditionalPanel(condition="input.beta_shape == 'linear' ",
-                             sliderInput("beta_linear_mean",label="The standardised effect size or margin of error of average proximal effect",min = 0, max = 1,value = 0.1),
-                             numericInput("beta_linear_initial", label = "The standardised effect size or margin of error of initial proximal effect",value = 0.01),
+                             sliderInput("beta_linear_mean",label="The standardized effect size or margin of error of average proximal effect",min = 0, max = 1,value = 0.1),
+                             numericInput("beta_linear_initial", label = "The standardized effect size or margin of error of initial proximal effect",value = 0.01),
                              p(em("Notes"),": The linearly increasing form of a proximal effect may be used if participants
                                                          will get more enthusiastically engage in the apps and thus the proximal effect will increase as the 
                                                          study goes."),
@@ -194,13 +198,20 @@ shinyUI(fluidPage(
             conditionalPanel(condition="input.beta_shape =='linear and constant'",
                              sliderInput("beta_linearconst_mean",label="The standardized effect size or margin of error of average proximal effect",min = 0, max = 1,value = 0.1),
                              numericInput("beta_linearconst_max", label = "Day of maximal proximal effect", value = 28),
-                             numericInput("beta_linearconst_initial", label = "The standardised effect size or margin of error of initial proximal effect",value = 0.01),
+                             numericInput("beta_linearconst_initial", label = "The standardized effect size or margin of error of initial proximal effect",value = 0.01),
                              p(em("Notes"),": The linear then constant form of a proximal effect might be used, e.g., if you expect that 
                                                          participants will be benefit from the messages
                                                          and thus the proximal effect will get higher until reach maximum value then maintain it for the rest of the
                                                          study period.")
             )
             
+        )
+        ),
+        tabPanel("Category-varying",
+                 br(),
+                 
+        
+        )
         ),
         tags$hr(),
         
