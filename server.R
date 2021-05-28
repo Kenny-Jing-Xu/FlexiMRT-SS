@@ -217,58 +217,66 @@ shinyServer(
     else{ stop( "Error: Please specify a pattern for the expected availability" ) }
     
     beta_shape = input$beta_shape
-    if( beta_shape == "linear and constant" ){
-      beta_mean = rep( input$beta_linearconst_mean, sum( aa_each ) )
-      if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
-      else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
-      
-      beta_initial = rep( input$beta_linearconst_initial, sum( aa_each ) )
-      if( min(beta_initial) >=0 & max(beta_initial) <= beta_mean ){ beta_initial <- beta_initial }
-      else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
-      
-      beta_quadratic_max = aa_day_aa - 1 + input$beta_linearconst_max
-      if( min(beta_quadratic_max) >= 1 & max(beta_quadratic_max) <= days ){ beta_quadratic_max <- round(beta_quadratic_max) }
-      else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
+    if(input$proEff == "Category-same"){
+      if( beta_shape == "linear and constant" ){
+        beta_mean = rep( input$beta_linearconst_mean, sum( aa_each ) )
+        if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
+        else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
+        
+        beta_initial = rep( input$beta_linearconst_initial, sum( aa_each ) )
+        if( min(beta_initial) >=0 & max(beta_initial) <= beta_mean ){ beta_initial <- beta_initial }
+        else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
+        
+        beta_quadratic_max = aa_day_aa - 1 + input$beta_linearconst_max
+        if( min(beta_quadratic_max) >= 1 & max(beta_quadratic_max) <= days ){ beta_quadratic_max <- round(beta_quadratic_max) }
+        else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
+      }
+      else if( beta_shape == "quadratic"  )
+      {
+        beta_mean = rep( input$beta_quadratic_mean, sum( aa_each ) )
+        if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
+        else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
+        
+        beta_initial = rep( input$beta_quadratic_initial, sum( aa_each ) )
+        if( min(beta_initial) >=0 & max(beta_initial) <= beta_mean ){ beta_initial <- beta_initial }
+        else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
+        
+        beta_quadratic_max = aa_day_aa - 1 + input$beta_quadratic_max
+        if( min(beta_quadratic_max) >= 1 & max(beta_quadratic_max) <= days ){ beta_quadratic_max <- round(beta_quadratic_max) }
+        else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
+      }
+      else if( beta_shape == "linear"  )
+      {
+        beta_mean = rep( input$beta_linear_mean, sum( aa_each ) )
+        if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
+        else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
+        
+        beta_initial = rep( input$beta_linear_initial, sum( aa_each ) )
+        if( min(beta_initial) >=0 & max(beta_initial) <= beta_mean ){ beta_initial <- beta_initial }
+        else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
+        
+        beta_quadratic_max = aa_day_aa - 1 + days
+        
+      }
+      else if( beta_shape == "constant"  )
+      {
+        beta_mean = rep( input$beta_constant_mean, sum( aa_each ) )
+        if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
+        else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
+        
+        beta_initial = rep( input$beta_constant_mean, sum( aa_each ) )
+        
+        beta_quadratic_max = aa_day_aa - 1 + 1
+        
+      }
+      else{ stop( "Error: Please specify a trend for the proximal effect" ) }
     }
-    else if( beta_shape == "quadratic"  )
-    {
-      beta_mean = rep( input$beta_quadratic_mean, sum( aa_each ) )
-      if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
-      else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
+    else{
       
-      beta_initial = rep( input$beta_quadratic_initial, sum( aa_each ) )
-      if( min(beta_initial) >=0 & max(beta_initial) <= beta_mean ){ beta_initial <- beta_initial }
-      else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
       
-      beta_quadratic_max = aa_day_aa - 1 + input$beta_quadratic_max
-      if( min(beta_quadratic_max) >= 1 & max(beta_quadratic_max) <= days ){ beta_quadratic_max <- round(beta_quadratic_max) }
-      else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
-    }
-    else if( beta_shape == "linear"  )
-    {
-      beta_mean = rep( input$beta_linear_mean, sum( aa_each ) )
-      if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
-      else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
-      
-      beta_initial = rep( input$beta_linear_initial, sum( aa_each ) )
-      if( min(beta_initial) >=0 & max(beta_initial) <= beta_mean ){ beta_initial <- beta_initial }
-      else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
-      
-      beta_quadratic_max = aa_day_aa - 1 + days
       
     }
-    else if( beta_shape == "constant"  )
-    {
-      beta_mean = rep( input$beta_constant_mean, sum( aa_each ) )
-      if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
-      else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
-      
-      beta_initial = rep( input$beta_constant_mean, sum( aa_each ) )
-      
-      beta_quadratic_max = aa_day_aa - 1 + 1
-      
-    }
-    else{ stop( "Error: Please specify a trend for the proximal effect" ) }
+    
     method <- input$method
     
     if( input$test %in% c("chi",
@@ -329,7 +337,13 @@ shinyServer(
                                   beta_quadratic_max=beta_quadratic_max, tau_shape=tau_shape, tau_mean=tau_mean, tau_initial=tau_mean, tau_quadratic_max=beta_quadratic_max, 
                                   sigma=1, pow=pow, sigLev=sigLev, method = method, test = test, result = result )
         N <- MRTN$N
-        HTML(paste("<h4 style = 'color:blue';> The required sample size is ", N, "to attain", input$power*100,"% power when the significance level is",input$sigLev,".")) 
+        if( N >= 10*sum(aa_each) ){
+          HTML(paste("<h4 style = 'color:blue';> The required sample size is ", N, "to attain", input$power*100,"% power when the significance level is",input$sigLev,".")) 
+        }
+        else{
+          HTML(paste("<h4 style = 'color:blue';> The required sample size is less than", 10*sum(aa_each), "to attain", input$power*100,"% power when the significance level is",input$sigLev,". Please refer to Additional Considerations Section in the left column for suggestions.")) 
+        }
+        
       }
       else if( result == "choice_power" )
       {
@@ -355,7 +369,15 @@ shinyServer(
                                   sigma=1, pow=pow, sigLev=sigLev, method = method, test = test, result = result)
         N <- MRTN$N
         CP <- ( 1 - sigLev )*100
-        HTML(paste("<h4 style = 'color:blue';> The required sample size is ", N, "to attain", CP,"% coverage probability.")) 
+        if( N >= 10*sum(aa_each) ){
+          HTML(paste("<h4 style = 'color:blue';> The required sample size is ", N, "to attain", CP,"% coverage probability.")) 
+        }
+        else{
+          HTML(paste("<h4 style = 'color:blue';> The required sample size is less than", 10*sum(aa_each), "to attain", CP,"% coverage probability. Please refer to the Additional Considerations Section in the left column for suggestions.")) 
+        }
+        
+        
+        
       }
       else if( result == "choice_coverage_probability" )
       {
