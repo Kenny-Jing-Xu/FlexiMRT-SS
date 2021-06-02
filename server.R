@@ -117,11 +117,12 @@ shinyServer(
       content = function(file) {
         write.csv(
           as.data.frame(
-            matrix(
-              NA,
+            matrix( 
+              c( 1:input$days, rep( NA, input$days*(0+4) ) ),  
               nrow = input$days,
-              ncol = 4,
+              ncol = 1+4,
               dimnames = list(NULL, c(
+                "Day",
                 "randomization.probability.control",
                 "randomization.probability.intervention1",
                 "randomization.probability.intervention2",
@@ -136,15 +137,61 @@ shinyServer(
       contentType = "text/csv"
     )
     
+    ### Download handlers for reactively-created standardized effect size or margin of error of average proximal effect templates ###
+    output$catvar_beta_linearconst_template <- downloadHandler(
+      filename = function() {paste0("FlexiMRT-SS-beta-linear-const.csv")},
+      content = function(file) {
+        write.csv(
+          as.data.frame(
+            matrix( 
+              c( 
+                1:( input$messages_start + input$messages_mid ),
+                rep( NA, 1*( input$messages_start + input$messages_mid ) ), 
+                rep( NA, 1*( input$messages_start + input$messages_mid ) ),
+                rep( NA, 1*( input$messages_start + input$messages_mid ) )
+                 ),  
+              nrow = input$messages_start + input$messages_mid,
+              ncol = 4,
+              dimnames = list(NULL, c(
+                "intervention_category",
+                "beta_mean",
+                "beta_initial",
+                "beta_max"
+              )
+              )
+            )
+          ),
+          file = file, na = "", row.names = F
+        )
+      },
+      contentType = "text/csv"
+    )
+    
+    
+    
     output$download_template_caption <- renderText({
       paste("The template will contain one row per day.", 
             "Just fill in your desired randomization probabilities for the control and intervention categories, and upload the file.")
     })
     
+    output$download_template_caption_beta_linearconst_var <- renderText({
+      paste("Each row represents an intervention category.", 
+            "Just fill in your selected standardized effect size or margin of error of average and initial proximal effects, and the day tha tthe average proximal effect reaching its maximum or minimum for each of intervention categories, 
+            and upload the file.")
+    })
+    
+    
+    
     #### File Upload reset button
     observeEvent( input$file.resetbutton, 
                  { reset( paste0( "file1" ) ) }
     )
+    
+    observeEvent( input$file_beta_linearconst_var.resetbutton, 
+                  { reset( paste0( "beta_linearconst_var" ) ) }
+    )
+    
+    
   
   ### Generate the current result of sample size 
   ### Constant trend of expected availability
@@ -216,15 +263,16 @@ shinyServer(
     }
     else{ stop( "Error: Please specify a pattern for the expected availability" ) }
     
-    beta_shape = input$beta_shape
+    
     if(input$proEff == "Category-same"){
+      beta_shape = input$beta_shape
       if( beta_shape == "linear and constant" ){
         beta_mean = rep( input$beta_linearconst_mean, sum( aa_each ) )
         if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
         else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
         
         beta_initial = rep( input$beta_linearconst_initial, sum( aa_each ) )
-        if( min(beta_initial) >=0 & max(beta_initial) <= beta_mean ){ beta_initial <- beta_initial }
+        if( min(beta_initial) >=0 & max(beta_initial) <= 1 ){ beta_initial <- beta_initial }
         else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
         
         beta_quadratic_max = aa_day_aa - 1 + input$beta_linearconst_max
@@ -238,7 +286,7 @@ shinyServer(
         else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
         
         beta_initial = rep( input$beta_quadratic_initial, sum( aa_each ) )
-        if( min(beta_initial) >=0 & max(beta_initial) <= beta_mean ){ beta_initial <- beta_initial }
+        if( min(beta_initial) >=0 & max(beta_initial) <= 1 ){ beta_initial <- beta_initial }
         else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
         
         beta_quadratic_max = aa_day_aa - 1 + input$beta_quadratic_max
@@ -252,7 +300,7 @@ shinyServer(
         else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
         
         beta_initial = rep( input$beta_linear_initial, sum( aa_each ) )
-        if( min(beta_initial) >=0 & max(beta_initial) <= beta_mean ){ beta_initial <- beta_initial }
+        if( min(beta_initial) >=0 & max(beta_initial) <= 1 ){ beta_initial <- beta_initial }
         else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
         
         beta_quadratic_max = aa_day_aa - 1 + days
@@ -271,8 +319,23 @@ shinyServer(
       }
       else{ stop( "Error: Please specify a trend for the proximal effect" ) }
     }
-    else{
-      
+    else if(input$proEff == "Category-varying"){
+      beta_shape <- input$beta_shape_var
+      if( beta_shape == "linear and constant" ){
+        inFile <- input$beta_linearconst_var
+        beta <- read.csv(inFile$datapath, header = TRUE)
+        beta_mean <- beta$beta_mean
+        if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
+        else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
+        
+        beta_initial <- beta$beta_initial
+        if( min(beta_initial) >=0 & max(beta_initial) <= 1 ){ beta_initial <- beta_initial }
+        else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
+        
+        beta_quadratic_max <- beta$beta_max
+        if( min(beta_quadratic_max) >= 1 & max(beta_quadratic_max) <= days ){ beta_quadratic_max <- round(beta_quadratic_max) }
+        else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
+      }
       
       
     }
@@ -322,6 +385,7 @@ shinyServer(
       ### If the randomization probability is time-varying ###
       inFile <- input$file1
       prob <- read.csv(inFile$datapath, header = TRUE)
+      prob <-  prob[, -1]
     }
     
     
