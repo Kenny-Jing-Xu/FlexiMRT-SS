@@ -220,6 +220,30 @@ shinyUI(fluidPage(
                                     onInitialize = I('function() { this.setValue(0); }')
                                 )
                  ),
+                 
+                 fluidRow(
+                     column(4,
+                            fileInput('beta_var', 'Choose a .csv file, where each row represents an intervention category, 
+                                             containing the category-vary standardized effect size or margin of error of average and initial proximal effects (min=0 and max=1), 
+                                             and the day that average proximal effect reaching its maximum or minimum to upload',
+                                      accept = c('.csv')
+                            ),
+                            bsButton("file_beta_var.resetbutton", "Reset file upload", style = "link")
+                     ),
+                     column(4,
+                            ### downloading the sample file 
+                            p("If you would like to use a template, you can download one here:"),
+                            downloadButton("catvar_beta_template", "Download Template"),
+                            br(),
+                            textOutput("download_template_caption_beta_var")
+                     )
+                     
+                 ),
+                 p(em("Notes"),": The linear then constant form of a proximal effect might be used, e.g., if you expect that 
+                                                         participants will be benefit from the messages
+                                                         and thus the proximal effect will get higher until reach maximum value then maintain it for the rest of the
+                                                         study period.")
+                 
                  ### Inputs for quadratic trend of proximal effect ###
                  
                  
@@ -231,33 +255,9 @@ shinyUI(fluidPage(
                  
                  
                  ### Inputs for linear then constant trend of proximal effect ###
-                 conditionalPanel(condition="input.beta_shape_var =='linear and constant'",
-                                  fluidRow(
-                                      column(4,
-                                             
-                                             #conditionalPanel(condition="input.numbers =='re_dec'",
-                                             fileInput('beta_linearconst_var', 'Choose a .csv file, where each row represents an intervention category, 
-                                             containing the category-vary standardized effect size or margin of error of average and initial proximal effects (min=0 and max=1), 
-                                             and the day that average proximal effect reaching its maximum or minimum to upload',
-                                                       accept = c('.csv')
-                                             ),
-                                             bsButton("file_beta_linearconst_var.resetbutton", "Reset file upload", style = "link")
-                                      ),
-                                      
-                                      column(4,
-                                             ### downloading the sample file 
-                                             p("If you would like to use a template, you can download one here:"),
-                                             downloadButton("catvar_beta_linearconst_template", "Download Template"),
-                                             br(),
-                                             textOutput("download_template_caption_beta_linearconst_var")
-                                      )
-                                      
-                                  ),
-                                  p(em("Notes"),": The linear then constant form of a proximal effect might be used, e.g., if you expect that 
-                                                         participants will be benefit from the messages
-                                                         and thus the proximal effect will get higher until reach maximum value then maintain it for the rest of the
-                                                         study period.")
-                 )     
+                 #conditionalPanel(condition="input.beta_shape_var =='linear and constant'",
+                                  
+                 #)     
         
         )
         ),
