@@ -273,7 +273,7 @@ shinyServer(
         else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
         beta_quadratic_max = aa_day_aa - 1 + input$beta_linearconst_max
         #if( min( beta_quadratic_max - ( aa_day_aa - 1 ) ) >= 1 & max(beta_quadratic_max - ( aa_day_aa - 1 ) ) <= days ){ 
-          beta_quadratic_max <- round(beta_quadratic_max) 
+        #  beta_quadratic_max <- round(beta_quadratic_max) 
          # }
         #else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
       }
@@ -287,7 +287,7 @@ shinyServer(
         else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
         beta_quadratic_max = aa_day_aa - 1 + input$beta_quadratic_max
         #if( min(beta_quadratic_max - ( aa_day_aa - 1 ) ) >= 1 & max(beta_quadratic_max - ( aa_day_aa - 1 ) ) <= days ){ 
-          beta_quadratic_max <- round(beta_quadratic_max) 
+        #  beta_quadratic_max <- round(beta_quadratic_max) 
          # }
         #else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
       }
@@ -327,7 +327,7 @@ shinyServer(
         
         beta_quadratic_max <- beta$beta_max
         #if( min(beta_quadratic_max - ( aa_day_aa - 1 ) ) >= 1 & max(beta_quadratic_max - ( aa_day_aa - 1 ) ) <= days ){ 
-          beta_quadratic_max <- round(beta_quadratic_max) 
+         # beta_quadratic_max <- round(beta_quadratic_max) 
          # }
         #else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
         
@@ -347,7 +347,7 @@ shinyServer(
         
         beta_quadratic_max <- beta$beta_max
         #if( min(beta_quadratic_max - ( aa_day_aa - 1 ) ) >= 1 & max(beta_quadratic_max - ( aa_day_aa - 1 ) ) <= days ){ 
-          beta_quadratic_max <- round(beta_quadratic_max) 
+         # beta_quadratic_max <- round(beta_quadratic_max) 
          # }
         #else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
         
