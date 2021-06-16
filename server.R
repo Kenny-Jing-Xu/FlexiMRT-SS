@@ -138,8 +138,8 @@ shinyServer(
     )
     
     ### Download handlers for reactively-created standardized effect size or margin of error of average proximal effect templates ###
-    output$catvar_beta_linearconst_template <- downloadHandler(
-      filename = function() {paste0("FlexiMRT-SS-beta-linear-const.csv")},
+    output$catvar_beta_template <- downloadHandler(
+      filename = function() {paste0("FlexiMRT-SS-beta.csv")},
       content = function(file) {
         write.csv(
           as.data.frame(
@@ -167,17 +167,15 @@ shinyServer(
       contentType = "text/csv"
     )
     
-    
-    
     output$download_template_caption <- renderText({
       paste("The template will contain one row per day.", 
             "Just fill in your desired randomization probabilities for the control and intervention categories, and upload the file.")
     })
     
-    output$download_template_caption_beta_linearconst_var <- renderText({
+    output$download_template_caption_beta_var <- renderText({
       paste("Each row represents an intervention category.", 
             "Just fill in your selected standardized effect size or margin of error of average and initial proximal effects, and the day tha tthe average proximal effect reaching its maximum or minimum for each of intervention categories, 
-            and upload the file.")
+            and upload the file. For the constant trend, the initial and max columns can be empty while for the linear trend, the max column can be empty.")
     })
     
     
@@ -187,8 +185,8 @@ shinyServer(
                  { reset( paste0( "file1" ) ) }
     )
     
-    observeEvent( input$file_beta_linearconst_var.resetbutton, 
-                  { reset( paste0( "beta_linearconst_var" ) ) }
+    observeEvent( input$file_beta_var.resetbutton, 
+                  { reset( paste0( "beta_var" ) ) }
     )
     
     
@@ -204,7 +202,7 @@ shinyServer(
                                {  ### Generate this current result of sample size if the corresponding 
                                   ### action button is pressed
                                  
-    days = input$days
+    days <- input$days
     if( days > 0 ){ days <- round(days) }
     else{ stop( "Error: Please specify the duration of the study greater than 0" ) }
     
@@ -270,60 +268,55 @@ shinyServer(
         beta_mean = rep( input$beta_linearconst_mean, sum( aa_each ) )
         if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
         else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
-        
         beta_initial = rep( input$beta_linearconst_initial, sum( aa_each ) )
         if( min(beta_initial) >=0 & max(beta_initial) <= 1 ){ beta_initial <- beta_initial }
         else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
-        
         beta_quadratic_max = aa_day_aa - 1 + input$beta_linearconst_max
-        if( min(beta_quadratic_max) >= 1 & max(beta_quadratic_max) <= days ){ beta_quadratic_max <- round(beta_quadratic_max) }
-        else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
+        #if( min( beta_quadratic_max - ( aa_day_aa - 1 ) ) >= 1 & max(beta_quadratic_max - ( aa_day_aa - 1 ) ) <= days ){ 
+          beta_quadratic_max <- round(beta_quadratic_max) 
+         # }
+        #else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
       }
       else if( beta_shape == "quadratic"  )
       {
         beta_mean = rep( input$beta_quadratic_mean, sum( aa_each ) )
         if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
         else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
-        
         beta_initial = rep( input$beta_quadratic_initial, sum( aa_each ) )
         if( min(beta_initial) >=0 & max(beta_initial) <= 1 ){ beta_initial <- beta_initial }
         else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
-        
         beta_quadratic_max = aa_day_aa - 1 + input$beta_quadratic_max
-        if( min(beta_quadratic_max) >= 1 & max(beta_quadratic_max) <= days ){ beta_quadratic_max <- round(beta_quadratic_max) }
-        else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
+        #if( min(beta_quadratic_max - ( aa_day_aa - 1 ) ) >= 1 & max(beta_quadratic_max - ( aa_day_aa - 1 ) ) <= days ){ 
+          beta_quadratic_max <- round(beta_quadratic_max) 
+         # }
+        #else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
       }
       else if( beta_shape == "linear"  )
       {
         beta_mean = rep( input$beta_linear_mean, sum( aa_each ) )
         if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
         else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
-        
         beta_initial = rep( input$beta_linear_initial, sum( aa_each ) )
         if( min(beta_initial) >=0 & max(beta_initial) <= 1 ){ beta_initial <- beta_initial }
         else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
-        
         beta_quadratic_max = aa_day_aa - 1 + days
-        
       }
       else if( beta_shape == "constant"  )
       {
         beta_mean = rep( input$beta_constant_mean, sum( aa_each ) )
         if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
         else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
-        
         beta_initial = rep( input$beta_constant_mean, sum( aa_each ) )
-        
         beta_quadratic_max = aa_day_aa - 1 + 1
-        
       }
       else{ stop( "Error: Please specify a trend for the proximal effect" ) }
     }
     else if(input$proEff == "Category-varying"){
       beta_shape <- input$beta_shape_var
       if( beta_shape == "linear and constant" ){
-        inFile <- input$beta_linearconst_var
+        inFile <- input$beta_var
         beta <- read.csv(inFile$datapath, header = TRUE)
+        
         beta_mean <- beta$beta_mean
         if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
         else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
@@ -333,11 +326,62 @@ shinyServer(
         else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
         
         beta_quadratic_max <- beta$beta_max
-        if( min(beta_quadratic_max) >= 1 & max(beta_quadratic_max) <= days ){ beta_quadratic_max <- round(beta_quadratic_max) }
-        else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
+        #if( min(beta_quadratic_max - ( aa_day_aa - 1 ) ) >= 1 & max(beta_quadratic_max - ( aa_day_aa - 1 ) ) <= days ){ 
+          beta_quadratic_max <- round(beta_quadratic_max) 
+         # }
+        #else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
+        
       }
-      
-      
+      else if(beta_shape == "quadratic")
+      {
+        inFile <- input$beta_var
+        beta <- read.csv(inFile$datapath, header = TRUE)
+        
+        beta_mean <- beta$beta_mean
+        if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
+        else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
+        
+        beta_initial <- beta$beta_initial
+        if( min(beta_initial) >=0 & max(beta_initial) <= 1 ){ beta_initial <- beta_initial }
+        else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
+        
+        beta_quadratic_max <- beta$beta_max
+        #if( min(beta_quadratic_max - ( aa_day_aa - 1 ) ) >= 1 & max(beta_quadratic_max - ( aa_day_aa - 1 ) ) <= days ){ 
+          beta_quadratic_max <- round(beta_quadratic_max) 
+         # }
+        #else{ stop("Error: Please specify the maximum proximal effect day within the study duration") }
+        
+      }
+      else if( beta_shape == "linear"  )
+      {
+        inFile <- input$beta_var
+        beta <- read.csv(inFile$datapath, header = TRUE)
+        
+        beta_mean <- beta$beta_mean
+        if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
+        else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
+        
+        beta_initial <- beta$beta_initial
+        if( min(beta_initial) >=0 & max(beta_initial) <= 1 ){ beta_initial <- beta_initial }
+        else{ stop("Error: Please specify the standardized initial effect size greater than or equal to 0, and less than or equal to average standardized effect size") }
+        
+        beta_quadratic_max <- aa_day_aa - 1 + days
+        
+      }
+      else if( beta_shape == "constant"  )
+      {
+        inFile <- input$beta_var
+        beta <- read.csv(inFile$datapath, header = TRUE)
+        
+        beta_mean <- beta$beta_mean
+        if( min(beta_mean) >0 & max(beta_mean) <= 1 ){ beta_mean <- beta_mean }
+        else{ stop("Error: Please specify the average standardized effect size greater than 0, but less or equal to 1") }
+        
+        beta_initial <- beta_mean
+        
+        beta_quadratic_max <- aa_day_aa - 1 + days
+        
+      }
     }
     
     method <- input$method
