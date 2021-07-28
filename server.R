@@ -174,7 +174,7 @@ shinyServer(
     
     output$download_template_caption_beta_var <- renderText({
       paste("Each row represents an intervention category.", 
-            "Just fill in your selected standardized effect size or margin of error of average and initial proximal effects, and the day tha tthe average proximal effect reaching its maximum or minimum for each of intervention categories, 
+            "Just fill in your selected standardized effect size or margin of error of average and initial proximal effects, and the day that the average proximal effect reaching its maximum or minimum for each of intervention categories, 
             and upload the file. For the constant trend, the initial and max columns can be empty while for the linear trend, the max column can be empty.")
     })
     
