@@ -43,7 +43,7 @@ shinyUI(fluidPage(
         ),                                  
         tags$hr(),
         
-        h3("Number of Intervention Message Category"),
+        h3("Number of Intervention (Not Control) Message Category"),
         verticalLayout(
             numericInput("messages_start",label = "Added at the first day of the study", value = 3 ),
             numericInput("messages_mid",label = "Added at the halfway in days of the study period", value = 1 )
