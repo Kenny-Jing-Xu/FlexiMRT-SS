@@ -27,7 +27,17 @@ shinyUI(fluidPage(
     
     ### Introduction of FlexiMRT-SS Calculator on left-hand side panel ###
     sidebarPanel(
-        includeHTML("www/sidebar.Rhtml")
+        includeHTML("www/sidebar.Rhtml"),
+        
+        HTML('<script type="text/javascript">
+        $(document).ready(function() {
+          $("#DownloadButton").click(function() {
+            $("#Download").text("Loading...");
+          });
+        });
+      </script>
+')
+        
     ),
     
     ### Main Panel on the right-hand side ###
@@ -108,12 +118,10 @@ shinyUI(fluidPage(
         verticalLayout(
             ### Three patterns of expected availability to choose from 
             ### quadratic, constant and linear
-            selectizeInput("tau_shape", label = "Select one of the following patterns for the expected availability", 
+            selectInput("tau_shape", label = "Select one of the following patterns for the expected availability", 
                            choices=list("Quadratic" = "quadratic","Linear"="linear","Constant"="constant"),
-                           options = list(
-                               placeholder = "Please select a pattern",
-                               onInitialize = I('function() { this.setValue(0); }')
-                           )
+                           selected = "constant"
+                           #options = list( #placeholder = "Please select a pattern", onInitialize = I('function() { this.setValue(0); }') )
             ),
             ### Inputs for constant pattern of expected availability ###
             conditionalPanel(condition="input.tau_shape =='constant' ",
@@ -161,13 +169,11 @@ shinyUI(fluidPage(
         #verticalLayout(
             ### Four trends of proximal effect to choose from
             ### quadratic, constant, linear, linear then constant
-            selectizeInput("beta_shape", label = "Select one of the following trends for the proximal effect", 
+            selectInput("beta_shape", label = "Select one of the following trends for the proximal effect", 
                            choices=list("Quadratic" = "quadratic",
                                         "Linear"="linear","Constant"="constant","Linear then Constant"="linear and constant"),
-                           options = list(
-                               placeholder = "Please select a trend",
-                               onInitialize = I('function() { this.setValue(0); }')
-                           )
+                           selected = "linear and constant"
+                           #options = list(placeholder = "Please select a trend", onInitialize = I('function() { this.setValue(0); }') )
             ),
             ### Inputs for quadratic trend of proximal effect ###
             conditionalPanel(condition="input.beta_shape =='quadratic'",
@@ -215,10 +221,8 @@ shinyUI(fluidPage(
                  selectizeInput("beta_shape_var", label = "Select one of the following trends for the proximal effect", 
                                 choices=list("Quadratic" = "quadratic",
                                              "Linear"="linear","Constant"="constant","Linear then Constant"="linear and constant"),
-                                options = list(
-                                    placeholder = "Please select a trend",
-                                    onInitialize = I('function() { this.setValue(0); }')
-                                )
+                                #selected = "linear and constant"
+                                options = list(placeholder = "Please select a trend", onInitialize = I('function() { this.setValue(0); }') )
                  ),
                  
                  fluidRow(
@@ -342,8 +346,8 @@ shinyUI(fluidPage(
             ### Output warnings if you type in wrong format for "Significance level" ###
             textOutput("significance_warning"),
             
-            #### choice to calculate sample size (action buttons) ####
-            actionButton("size_power_cp","Get Result"),
+            #### choice to calculate sample size (action buttons) "Get Result",  ####
+            actionButton("size_power_cp", span("Get Result", id="size_power_cp", class="Loading...") ),
             uiOutput("result_size_power_cp")
             
         ),
