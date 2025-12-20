@@ -384,7 +384,7 @@ shinyUI(fluidPage(
         conditionalPanel(condition="input.test !='chi'
                                                && input.test != 'hotelling N'
                                                && input.test != 'hotelling N-1'
-                                               && input.test != 'hotelling N-q-1",
+                                               && input.test != 'hotelling N-q-1'",
                          uiOutput("result_warning_test")
         ),
         
