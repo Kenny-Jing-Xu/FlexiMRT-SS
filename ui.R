@@ -370,7 +370,7 @@ shinyUI(fluidPage(
         conditionalPanel(condition="input.beta_shape !='constant'
                                                && input.beta_shape != 'linear'
                                                && input.beta_shape != 'quadratic'
-                                               && input.beta_shape != 'linear and constant",
+                                               && input.beta_shape != 'linear and constant'",
                          uiOutput("result_warning_beta")
         ),
         
